@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -14,16 +15,27 @@ import java.time.LocalTime;
 public class Movie {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "movie_id", nullable = false)
     private Integer id;
 
-    @Column(name = "title", nullable = false, length = 100)
     private String title;
-
-    @Column(name = "release_date")
     private LocalDate releaseDate;
-
-    @Column(name = "duration")
     private LocalTime duration;
 
+    @ManyToMany
+    @JoinTable(
+            name = "movie_authors",
+            schema = "films",
+            joinColumns = @JoinColumn(name = "movie_id"),
+            inverseJoinColumns = @JoinColumn(name = "author_id")
+    )
+    private Set<Author> authors;
+
+    public Movie() {
+    }
+
+    public Movie(String title, LocalDate releaseDate, LocalTime duration) {
+        this.title = title;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+    }
 }

@@ -12,9 +12,13 @@ public class MovieAuthor {
     @EmbeddedId
     private MovieAuthorId id;
 
-    @MapsId("authorId")
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "author_id", nullable = false)
-    private Author author;
+    @ManyToOne
+    @MapsId("movieId")
+    @JoinColumn(name = "movie_id")
+    private Movie movie;
 
+    @ManyToOne
+    @MapsId("authorId")
+    @JoinColumn(name = "author_id")
+    private Author author;
 }

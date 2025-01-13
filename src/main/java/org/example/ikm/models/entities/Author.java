@@ -1,13 +1,11 @@
 package org.example.ikm.models.entities;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -15,16 +13,22 @@ import java.time.LocalDate;
 @Table(name = "authors", schema = "films")
 public class Author {
     @Id
-    @Column(name = "author_id", nullable = false)
-    private Short id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
-    @Column(name = "name", nullable = false, length = 100)
     private String name;
-
-    @Column(name = "birth_date")
     private LocalDate birthDate;
-
-    @Column(name = "bio", length = Integer.MAX_VALUE)
     private String bio;
 
+    @ManyToMany(mappedBy = "authors")
+    private Set<Movie> movies;
+
+    public Author() {
+    }
+
+    public Author(String name, LocalDate birthDate, String bio) {
+        this.name = name;
+        this.birthDate = birthDate;
+        this.bio = bio;
+    }
 }
