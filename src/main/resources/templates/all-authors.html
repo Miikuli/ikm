@@ -18,9 +18,13 @@
 <div class="container mt-5">
     <h2>Режиссеры фильмов: </h2>
     <div th:each="el : ${authors}" class="alert alert-info mt-2">
-        <h3 th:text = "${el.name}"/>
-        <a th:text = "${el.birthDate}"/>
-        <a th:text = "${el.bio}"/>
+        <h3 th:text="${el.name}"></h3>
+        <p>Дата рождения: <span th:text="${el.birthDate}"></span></p>
+        <p>Пол: <span th:text="${el.bio}"></span></p>
+        <a th:href="@{/authors/edit/{id}(id=${el.id})}" style="margin-bottom: 10px;" class="btn btn-warning">Редактировать</a>
+        <form th:action="@{/authors/delete/{id}(id=${el.id})}" method="post">
+            <button type="submit" class="btn btn-danger">Удалить автора</button>
+        </form>
     </div>
     <a href="/authors/add" class="btn btn-primary">
         Добавить режиссера

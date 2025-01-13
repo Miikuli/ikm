@@ -1,4 +1,4 @@
-package org.example.ikm.models.entities;
+package org.example.ikm.entities;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -18,15 +18,15 @@ public class Author {
 
     private String name;
     private LocalDate birthDate;
-    private String bio;
+    private char bio;
 
-    @ManyToMany(mappedBy = "authors")
+    @ManyToMany(mappedBy = "authors", cascade = CascadeType.ALL)
     private Set<Movie> movies;
 
     public Author() {
     }
 
-    public Author(String name, LocalDate birthDate, String bio) {
+    public Author(String name, LocalDate birthDate, char bio) {
         this.name = name;
         this.birthDate = birthDate;
         this.bio = bio;

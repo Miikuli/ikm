@@ -1,4 +1,4 @@
-package org.example.ikm.models.entities;
+package org.example.ikm.entities;
 
 import jakarta.persistence.Embeddable;
 

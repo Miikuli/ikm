@@ -1,4 +1,4 @@
-package org.example.ikm.models.entities;
+package org.example.ikm.entities;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -19,10 +19,6 @@ public class Review {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "movie_id")
     private Movie movie;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "author_id")
-    private Author author;
 
     @Column(name = "rating")
     private Short rating;

@@ -1,4 +1,4 @@
-package org.example.ikm.models.entities;
+package org.example.ikm.entities;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -21,7 +21,7 @@ public class Movie {
     private LocalDate releaseDate;
     private LocalTime duration;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name = "movie_authors",
             schema = "films",
