@@ -10,7 +10,6 @@ public class MovieAuthorId implements Serializable {
     private Integer movieId;
     private Integer authorId;
 
-    // Геттеры, сеттеры, equals, hashCode
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

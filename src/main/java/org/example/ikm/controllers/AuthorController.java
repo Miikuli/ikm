@@ -41,15 +41,12 @@ public class AuthorController {
 
     @PostMapping("/authors/delete/{id}")
     public String deleteAuthor(@PathVariable Short id) {
-        // Находим автора по ID
         Author author = authorRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Автор не найден"));
 
-        // Удаляем связи с фильмами
-        author.getMovies().clear(); // Очищаем связи
-        authorRepository.save(author); // Сохраняем изменения
+        author.getMovies().clear();
+        authorRepository.save(author);
 
-        // Удаляем автора
         authorRepository.delete(author);
 
         return "redirect:/authors";
@@ -57,11 +54,9 @@ public class AuthorController {
 
     @GetMapping("/authors/edit/{id}")
     public String editAuthorForm(@PathVariable Short id, Model model) {
-        // Находим автора по ID
         Author author = authorRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Автор не найден"));
 
-        // Передаем автора в шаблон
         model.addAttribute("author", author);
 
         return "edit-author";
@@ -75,16 +70,13 @@ public class AuthorController {
             @RequestParam char bio,
             Model model) {
 
-        // Находим автора по ID
         Author author = authorRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Автор не найден"));
 
-        // Обновляем данные автора
         author.setName(name);
         author.setBirthDate(birthDate);
         author.setBio(bio);
 
-        // Сохраняем изменения
         authorRepository.save(author);
 
         return "redirect:/authors";
