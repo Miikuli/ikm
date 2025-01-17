@@ -21,7 +21,7 @@ public class Movie {
     private LocalDate releaseDate;
     private LocalTime duration;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany( cascade = CascadeType.ALL)
     @JoinTable(
             name = "movie_authors",
             schema = "films",
@@ -30,6 +30,8 @@ public class Movie {
     )
     private Set<Author> authors;
 
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Review> reviews;
     public Movie() {
     }
 

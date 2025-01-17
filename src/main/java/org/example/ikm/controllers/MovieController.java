@@ -3,8 +3,10 @@ package org.example.ikm.controllers;
 import lombok.RequiredArgsConstructor;
 import org.example.ikm.entities.Author;
 import org.example.ikm.entities.Movie;
+import org.example.ikm.entities.Review;
 import org.example.ikm.repositories.AuthorRepository;
 import org.example.ikm.repositories.MovieRepository;
+import org.example.ikm.repositories.ReviewRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +23,8 @@ public class MovieController {
 
     private final MovieRepository movieRepository;
     private final AuthorRepository authorRepository;
+    private final ReviewRepository reviewRepository;
+
 
     @GetMapping("/movies")
     public String allMovies(Model model) {
@@ -62,8 +66,7 @@ public class MovieController {
         Movie movie = movieRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Фильм не найден"));
 
-        movie.getAuthors().clear();
-        movieRepository.save(movie);
+        reviewRepository.deleteAll(movie.getReviews());
 
         movieRepository.delete(movie);
 

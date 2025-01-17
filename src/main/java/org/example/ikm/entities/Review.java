@@ -29,4 +29,14 @@ public class Review {
     @Column(name = "review_date")
     private OffsetDateTime reviewDate;
 
+    public Review() {
+    }
+
+    public Review(UUID id, Movie movie, Short rating, String reviewText, OffsetDateTime reviewDate) {
+        this.id = id;
+        this.movie = movie;
+        this.rating = rating;
+        this.reviewText = reviewText;
+        this.reviewDate = reviewDate;
+    }
 }
