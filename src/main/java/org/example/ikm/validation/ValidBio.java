@@ -7,13 +7,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target({ ElementType.FIELD }) // Аннотация применяется к полям
-@Retention(RetentionPolicy.RUNTIME) // Аннотация доступна в runtime
-@Constraint(validatedBy = BioValidator.class) // Указываем валидатор
+@Target({ ElementType.FIELD })
+@Retention(RetentionPolicy.RUNTIME)
+@Constraint(validatedBy = BioValidator.class)
 public @interface ValidBio {
-    String message() default "Поле bio должно быть 'М' или 'Ж'"; // Сообщение об ошибке
+    String message() default "Поле bio должно быть 'М' или 'Ж'";
 
-    Class<?>[] groups() default {}; // Группы валидации (по умолчанию пусто)
+    Class<?>[] groups() default {};
 
-    Class<? extends Payload>[] payload() default {}; // Полезная нагрузка (по умолчанию пусто)
+    Class<? extends Payload>[] payload() default {};
 }

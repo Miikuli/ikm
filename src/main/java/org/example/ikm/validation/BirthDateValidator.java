@@ -8,14 +8,13 @@ public class BirthDateValidator implements ConstraintValidator<BirthDateConstrai
 
     @Override
     public void initialize(BirthDateConstraint constraintAnnotation) {
-        // Инициализация (если нужно)
     }
 
     @Override
     public boolean isValid(LocalDate birthDate, ConstraintValidatorContext context) {
         if (birthDate == null) {
-            return false; // Поле не может быть null
+            return false;
         }
-        return birthDate.getYear() <= 2005; // Проверяем, что год рождения <= 2005
+        return birthDate.getYear() <= 2005;
     }
 }

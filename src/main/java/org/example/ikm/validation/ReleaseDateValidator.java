@@ -8,14 +8,13 @@ public class ReleaseDateValidator implements ConstraintValidator<ReleaseDateCons
 
     @Override
     public void initialize(ReleaseDateConstraint constraintAnnotation) {
-        // Инициализация (если нужно)
     }
 
     @Override
     public boolean isValid(LocalDate releaseDate, ConstraintValidatorContext context) {
         if (releaseDate == null) {
-            return false; // Поле не может быть null
+            return false;
         }
-        return releaseDate.getYear() >= 1895; // Проверяем, что год выпуска >= 1895
+        return releaseDate.getYear() >= 1895;
     }
 }
