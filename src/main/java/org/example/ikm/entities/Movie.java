@@ -1,6 +1,8 @@
 package org.example.ikm.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,11 +19,18 @@ public class Movie {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @NotBlank(message = "Название фильма не может быть пустым")
+    @Size(max = 100, message = "Название фильма не может быть длиннее 100 символов")
+    @Column(name = "title", nullable = false, length = 100)
     private String title;
+
+    @Column(name = "release_date")
     private LocalDate releaseDate;
+
+    @Column(name = "duration")
     private LocalTime duration;
 
-    @ManyToMany( cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name = "movie_authors",
             schema = "films",
@@ -32,6 +41,7 @@ public class Movie {
 
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Review> reviews;
+
     public Movie() {
     }
 

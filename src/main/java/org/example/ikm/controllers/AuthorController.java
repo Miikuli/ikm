@@ -1,95 +1,78 @@
 package org.example.ikm.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.example.ikm.dto.AuthorDTO;
 import org.example.ikm.entities.Author;
-import org.example.ikm.entities.Movie;
 import org.example.ikm.repositories.AuthorRepository;
-import org.example.ikm.repositories.MovieRepository;
-import org.example.ikm.repositories.ReviewRepository;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
-@Controller
+@RestController
+@RequestMapping("/api/authors")
 @RequiredArgsConstructor
+@Tag(name = "Authors", description = "API для работы с авторами")
 public class AuthorController {
 
     private final AuthorRepository authorRepository;
-    private final MovieRepository movieRepository;
-    private final ReviewRepository reviewRepository;
 
-    @GetMapping("/authors")
-    public String allAuthors(Model model) {
-        Iterable<Author> authors = authorRepository.findAll();
-        model.addAttribute("authors", authors);
-        return "all-authors";
+    @GetMapping
+    @Operation(summary = "Получить всех авторов")
+    public ResponseEntity<List<AuthorDTO>> getAllAuthors() {
+        List<AuthorDTO> authors = authorRepository.findAll().stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(authors);
     }
 
-    @GetMapping("/authors/add")
-    public String addAuthor(Model model) {
-        return "add-author";
+    @PostMapping
+    @Operation(summary = "Добавить нового автора")
+    public ResponseEntity<AuthorDTO> addAuthor(@Valid @RequestBody AuthorDTO authorDTO) {
+        Author author = new Author();
+        author.setName(authorDTO.getName());
+        author.setBirthDate(authorDTO.getBirthDate());
+        author.setBio(authorDTO.getBio());
+
+        Author savedAuthor = authorRepository.save(author);
+        return ResponseEntity.ok(convertToDTO(savedAuthor));
     }
 
-    @PostMapping("/authors/add")
-    public String addAuthor(
-            @RequestParam String name,
-            @RequestParam LocalDate birthDate,
-            @RequestParam char bio,
-            Model model) {
-
-        Author author = new Author(name, birthDate, bio);
-        authorRepository.save(author);
-        return "redirect:/authors";
-    }
-
-    @PostMapping("/authors/delete/{id}")
-    public String deleteAuthor(@PathVariable Short id) {
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Удалить автора по ID")
+    public ResponseEntity<Void> deleteAuthor(@PathVariable Short id) {
         Author author = authorRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Автор не найден"));
-
-
-        for (Movie movie : author.getMovies()) {
-            // Удаляем все отзывы на фильм
-            reviewRepository.deleteAll(movie.getReviews());
-            // Удаляем фильм
-            movieRepository.delete(movie);
-        }
-
         authorRepository.delete(author);
-
-        return "redirect:/authors";
+        return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/authors/edit/{id}")
-    public String editAuthorForm(@PathVariable Short id, Model model) {
-        Author author = authorRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Автор не найден"));
-
-        model.addAttribute("author", author);
-
-        return "edit-author";
-    }
-
-    @PostMapping("/authors/edit/{id}")
-    public String editAuthor(
+    @PutMapping("/{id}")
+    @Operation(summary = "Обновить данные автора")
+    public ResponseEntity<AuthorDTO> updateAuthor(
             @PathVariable Short id,
-            @RequestParam String name,
-            @RequestParam LocalDate birthDate,
-            @RequestParam char bio,
-            Model model) {
+            @Valid @RequestBody AuthorDTO authorDTO) {
 
         Author author = authorRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Автор не найден"));
 
-        author.setName(name);
-        author.setBirthDate(birthDate);
-        author.setBio(bio);
+        author.setName(authorDTO.getName());
+        author.setBirthDate(authorDTO.getBirthDate());
+        author.setBio(authorDTO.getBio());
 
-        authorRepository.save(author);
+        Author updatedAuthor = authorRepository.save(author);
+        return ResponseEntity.ok(convertToDTO(updatedAuthor));
+    }
 
-        return "redirect:/authors";
+    private AuthorDTO convertToDTO(Author author) {
+        AuthorDTO dto = new AuthorDTO();
+        dto.setName(author.getName());
+        dto.setBirthDate(author.getBirthDate());
+        dto.setBio(author.getBio());
+        return dto;
     }
 }

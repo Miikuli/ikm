@@ -1,112 +1,92 @@
 package org.example.ikm.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.example.ikm.entities.Movie;
+import org.example.ikm.dto.ReviewDTO;
 import org.example.ikm.entities.Review;
 import org.example.ikm.repositories.MovieRepository;
 import org.example.ikm.repositories.ReviewRepository;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
-@Controller
+@RestController
+@RequestMapping("/api/reviews")
 @RequiredArgsConstructor
+@Tag(name = "Reviews", description = "API для работы с отзывами")
 public class ReviewController {
 
     private final ReviewRepository reviewRepository;
     private final MovieRepository movieRepository;
 
-    @GetMapping("/reviews")
-    public String allReviews(Model model) {
-        List<Review> reviews = reviewRepository.findAll();
-        model.addAttribute("reviews", reviews);
-        return "all-reviews";
+    @GetMapping
+    @Operation(summary = "Получить все отзывы")
+    public ResponseEntity<List<ReviewDTO>> getAllReviews() {
+        List<ReviewDTO> reviews = reviewRepository.findAll().stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(reviews);
     }
 
-    @GetMapping("/reviews/add")
-    public String addReviewForm(Model model) {
-        List<Movie> movies = movieRepository.findAll();
-        model.addAttribute("movies", movies);
-        return "add-review";
-    }
-
-    @PostMapping("/reviews/add")
-    public String addReview(
-            @RequestParam Integer movieId,
-            @RequestParam Short rating,
-            @RequestParam String reviewText,
-            Model model) {
-
-        Movie movie = movieRepository.findById(movieId)
-                .orElseThrow(() -> new RuntimeException("Фильм не найден"));
+    @PostMapping
+    @Operation(summary = "Добавить новый отзыв")
+    public ResponseEntity<ReviewDTO> addReview(
+            @Valid @RequestBody ReviewDTO reviewDTO) {
 
         Review review = new Review();
-        review.setId(UUID.randomUUID()); // Генерация UUID
-        review.setMovie(movie);
-        review.setRating(rating);
-        review.setReviewText(reviewText);
-        review.setReviewDate(OffsetDateTime.now());
+        review.setId(UUID.randomUUID());
+        review.setRating(reviewDTO.getRating());
+        review.setReviewText(reviewDTO.getReviewText());
+        review.setReviewDate(reviewDTO.getReviewDate());
 
-        reviewRepository.save(review);
+        // Устанавливаем фильм
+        review.setMovie(movieRepository.findById(reviewDTO.getMovieId())
+                .orElseThrow(() -> new RuntimeException("Фильм не найден")));
 
-        return "redirect:/reviews";
+        Review savedReview = reviewRepository.save(review);
+        return ResponseEntity.ok(convertToDTO(savedReview));
     }
 
-    @GetMapping("/movies/{movieId}/reviews")
-    public String movieReviews(@PathVariable Integer movieId, Model model) {
-        Movie movie = movieRepository.findById(movieId)
-                .orElseThrow(() -> new RuntimeException("Фильм не найден"));
-
-        List<Review> reviews = reviewRepository.findByMovie(movie);
-        model.addAttribute("movie", movie);
-        model.addAttribute("reviews", reviews);
-
-        return "movie-reviews";
-    }
-
-    @PostMapping("/reviews/delete/{id}")
-    public String deleteReview(@PathVariable UUID id) {
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Удалить отзыв по ID")
+    public ResponseEntity<Void> deleteReview(@PathVariable UUID id) {
         reviewRepository.deleteById(id);
-        return "redirect:/reviews";
+        return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/reviews/edit/{id}")
-    public String editReviewForm(@PathVariable UUID id, Model model) {
-        Review review = reviewRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Отзыв не найден"));
-
-        List<Movie> movies = movieRepository.findAll();
-
-        model.addAttribute("review", review);
-        model.addAttribute("movies", movies);
-
-        return "edit-review";
-    }
-
-    @PostMapping("/reviews/edit/{id}")
-    public String editReview(
+    @PutMapping("/{id}")
+    @Operation(summary = "Обновить данные отзыва")
+    public ResponseEntity<ReviewDTO> updateReview(
             @PathVariable UUID id,
-            @RequestParam Integer movieId,
-            @RequestParam Short rating,
-            @RequestParam String reviewText,
-            Model model) {
+            @Valid @RequestBody ReviewDTO reviewDTO) {
 
         Review review = reviewRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Отзыв не найден"));
 
-        Movie movie = movieRepository.findById(movieId)
-                .orElseThrow(() -> new RuntimeException("Фильм не найден"));
+        review.setRating(reviewDTO.getRating());
+        review.setReviewText(reviewDTO.getReviewText());
+        review.setReviewDate(reviewDTO.getReviewDate());
 
-        review.setMovie(movie);
-        review.setRating(rating);
-        review.setReviewText(reviewText);
+        // Обновляем фильм
+        review.setMovie(movieRepository.findById(reviewDTO.getMovieId())
+                .orElseThrow(() -> new RuntimeException("Фильм не найден")));
 
-        reviewRepository.save(review);
+        Review updatedReview = reviewRepository.save(review);
+        return ResponseEntity.ok(convertToDTO(updatedReview));
+    }
 
-        return "redirect:/reviews";
+    private ReviewDTO convertToDTO(Review review) {
+        ReviewDTO dto = new ReviewDTO();
+        dto.setId(review.getId());
+        dto.setRating(review.getRating());
+        dto.setReviewText(review.getReviewText());
+        dto.setReviewDate(review.getReviewDate());
+        dto.setMovieId(review.getMovie().getId());
+        return dto;
     }
 }
