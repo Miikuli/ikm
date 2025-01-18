@@ -30,24 +30,17 @@ public class Movie {
     @Column(name = "duration")
     private LocalTime duration;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany
     @JoinTable(
             name = "movie_authors",
             schema = "films",
             joinColumns = @JoinColumn(name = "movie_id"),
             inverseJoinColumns = @JoinColumn(name = "author_id")
     )
-    private Set<Author> authors;
+    private Set<Author> authors; // Используем Set<Author>
 
-    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Review> reviews;
-
-    public Movie() {
-    }
-
-    public Movie(String title, LocalDate releaseDate, LocalTime duration) {
-        this.title = title;
-        this.releaseDate = releaseDate;
-        this.duration = duration;
+    // Конструкторы, геттеры и сеттеры
+    public void setAuthors(Set<Author> authors) {
+        this.authors = authors;
     }
 }

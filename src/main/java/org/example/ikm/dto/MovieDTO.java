@@ -1,26 +1,44 @@
 package org.example.ikm.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
-import org.example.ikm.validation.ReleaseDateConstraint;
-
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.Set;
 
-@Getter
-@Setter
 public class MovieDTO {
-    @NotBlank(message = "Название фильма не может быть пустым")
-    @Size(max = 100, message = "Название фильма не может быть длиннее 100 символов")
     private String title;
-
-    @ReleaseDateConstraint
     private LocalDate releaseDate;
-
-    private LocalTime duration;
-
+    private DurationDTO duration; // Используем DurationDTO
     private Set<Short> authorIds;
+
+    // Геттеры и сеттеры
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public LocalDate getReleaseDate() {
+        return releaseDate;
+    }
+
+    public void setReleaseDate(LocalDate releaseDate) {
+        this.releaseDate = releaseDate;
+    }
+
+    public DurationDTO getDuration() {
+        return duration;
+    }
+
+    public void setDuration(DurationDTO duration) {
+        this.duration = duration;
+    }
+
+    public Set<Short> getAuthorIds() {
+        return authorIds;
+    }
+
+    public void setAuthorIds(Set<Short> authorIds) {
+        this.authorIds = authorIds;
+    }
 }

@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.example.ikm.dto.DurationDTO;
 import org.example.ikm.dto.MovieDTO;
 import org.example.ikm.entities.Author;
 import org.example.ikm.entities.Movie;
@@ -12,8 +13,10 @@ import org.example.ikm.repositories.MovieRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalTime;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
@@ -42,10 +45,20 @@ public class MovieController {
         Movie movie = new Movie();
         movie.setTitle(movieDTO.getTitle());
         movie.setReleaseDate(movieDTO.getReleaseDate());
-        movie.setDuration(movieDTO.getDuration());
+
+        // Преобразуем DurationDTO в LocalTime
+        DurationDTO durationDTO = movieDTO.getDuration();
+        LocalTime duration = LocalTime.of(
+                durationDTO.getHour(),
+                durationDTO.getMinute(),
+                durationDTO.getSecond(),
+                durationDTO.getNano()
+        );
+        movie.setDuration(duration);
 
         // Устанавливаем авторов
-        movie.setAuthors(new HashSet<>(authorRepository.findAllById(movieDTO.getAuthorIds())));
+        Set<Author> authors = new HashSet<>(authorRepository.findAllById(movieDTO.getAuthorIds()));
+        movie.setAuthors(authors);
 
         Movie savedMovie = movieRepository.save(movie);
         return ResponseEntity.ok(convertToDTO(savedMovie));
@@ -71,10 +84,20 @@ public class MovieController {
 
         movie.setTitle(movieDTO.getTitle());
         movie.setReleaseDate(movieDTO.getReleaseDate());
-        movie.setDuration(movieDTO.getDuration());
+
+        // Преобразуем DurationDTO в LocalTime
+        DurationDTO durationDTO = movieDTO.getDuration();
+        LocalTime duration = LocalTime.of(
+                durationDTO.getHour(),
+                durationDTO.getMinute(),
+                durationDTO.getSecond(),
+                durationDTO.getNano()
+        );
+        movie.setDuration(duration);
 
         // Обновляем авторов
-        movie.setAuthors(new HashSet<>(authorRepository.findAllById(movieDTO.getAuthorIds())));
+        Set<Author> authors = new HashSet<>(authorRepository.findAllById(movieDTO.getAuthorIds()));
+        movie.setAuthors(authors);
 
         Movie updatedMovie = movieRepository.save(movie);
         return ResponseEntity.ok(convertToDTO(updatedMovie));
@@ -84,7 +107,16 @@ public class MovieController {
         MovieDTO dto = new MovieDTO();
         dto.setTitle(movie.getTitle());
         dto.setReleaseDate(movie.getReleaseDate());
-        dto.setDuration(movie.getDuration());
+
+        // Преобразуем LocalTime в DurationDTO
+        LocalTime duration = movie.getDuration();
+        DurationDTO durationDTO = new DurationDTO();
+        durationDTO.setHour(duration.getHour());
+        durationDTO.setMinute(duration.getMinute());
+        durationDTO.setSecond(duration.getSecond());
+        durationDTO.setNano(duration.getNano());
+        dto.setDuration(durationDTO);
+
         dto.setAuthorIds(movie.getAuthors().stream()
                 .map(Author::getId)
                 .collect(Collectors.toSet()));
